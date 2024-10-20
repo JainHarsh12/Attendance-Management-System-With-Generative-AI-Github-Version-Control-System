@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Repository - TaskMasterXHub</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="side-nav">
+        <h2>TaskMasterXHub</h2>
+        <ul>
+            <li><a href="{{ url_for('github_dashboard') }}"><i class="fas fa-home"></i> GitHub Dashboard</a></li>
+<li><a href="{{ url_for('my_repositories') }}"><i class="fas fa-compass"></i> My Repositories</a></li>
+<li><a href="{{ url_for('explore_repositories') }}"><i class="fas fa-compass"></i> Explore Repositories</a></li>
+
+
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="dashboard-container">
+        <div class="header">
+            <h1>Create a New Repository</h1>
+        </div>
+
+        <div class="create-repo">
+            <form method="POST" action="{{ url_for('create_repo') }}">
+                <input type="text" placeholder="Repository name" name="repository_name" required>
+                <textarea name="description" placeholder="Description (optional)"></textarea>
+                <select name="visibility">
+                    <option value="public">Public</option>
+                    <option value="private">Private</option>
+                </select>
+                <button type="submit">Create Repository</button>
+            </form>
+        </div>
+    </div>
+    
+</body>
+</html>

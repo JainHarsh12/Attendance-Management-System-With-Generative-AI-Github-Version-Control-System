@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskMasterXHub - Dashboard</title>
+    <!-- Include Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        /* Global Reset & Body Styling */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Arial', sans-serif; background-color: #f7f8fc; color: #333; }
+
+        /* Sidebar */
+        .side-nav {
+            background-color: #1f2937;
+            color: white;
+            width: 250px;
+            height: 100vh;
+            position: fixed;
+            top: 0; left: 0;
+            padding: 20px;
+        }
+        .side-nav h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.5rem;
+        }
+        .side-nav ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .side-nav ul li {
+            margin-bottom: 20px;
+        }
+        .side-nav ul li a {
+            text-decoration: none;
+            color: white;
+            font-size: 1.1rem;
+            display: block;
+            padding: 10px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        .side-nav ul li a:hover {
+            background-color: #111827;
+            transform: translateY(-3px);
+        }
+        .side-nav ul li.active a {
+            background-color: #1a73e8;
+        }
+
+        /* Main Content */
+        .dashboard-container {
+            margin-left: 260px;
+            padding: 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        .header {
+            grid-column: span 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 2.5rem;
+            color: #1f2937;
+        }
+        .header .search {
+            padding: 10px;
+            border-radius: 20px;
+            border: 1px solid #ddd;
+            width: 300px;
+            outline: none;
+            background-image: url('search-icon.svg');
+            background-position: 10px center;
+            background-repeat: no-repeat;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Notification Bar */
+        .notification {
+            background: linear-gradient(90deg, #ffcc00, #fbb034);
+            padding: 10px 20px;
+            border-radius: 10px;
+            grid-column: span 2;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: bold;
+        }
+        .notification i {
+            margin-right: 10px;
+        }
+
+        /* Repositories Section */
+        .repository-section {
+            background-color: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+        .repository-section h2 {
+            font-size: 1.7rem;
+            color: #1f2937;
+            margin-bottom: 20px;
+        }
+        .repository-section ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .repository-section ul li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .repository-section ul li a {
+            color: #007bff;
+            font-size: 1.2rem;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .repository-section ul li a:hover {
+            text-decoration: underline;
+            color: #0056b3;
+        }
+
+        /* Buttons for Actions */
+        .repository-section ul li .actions {
+            display: flex;
+            gap: 15px;
+        }
+        .btn-action {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn-action:hover {
+            background-color: #0056b3;
+            transform: translateY(-3px);
+        }
+
+        /* Create Repository Section */
+        .create-repo {
+            grid-column: span 2;
+            background-color: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+        .create-repo h2 {
+            font-size: 1.7rem;
+            margin-bottom: 20px;
+            color: #1f2937;
+        }
+        .create-repo input, .create-repo select, .create-repo button {
+            margin-bottom: 20px;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            width: 100%;
+            outline: none;
+        }
+        .create-repo button {
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 1.2rem;
+            padding: 15px;
+        }
+        .create-repo button:hover {
+            background-color: #218838;
+        }
+
+        /* Footer */
+        footer {
+            grid-column: span 2;
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+            background-color: #f9fafc;
+            border-top: 1px solid #eee;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="side-nav">
+        <h2>TaskMasterXHub</h2>
+        <ul>
+            <li><a href="{{ url_for('dashboard') }}"><i class="fas fa-th-large"></i> Dashboard</a></li>
+            <li><a href="{{ url_for('github_dashboard') }}"><i class="fas fa-home"></i> GitHub Dashboard</a></li>
+            <li><a href="{{ url_for('create_repo') }}"><i class="fas fa-plus-circle"></i> Create Repository</a></li>
+            <li><a href="{{ url_for('my_repositories') }}"><i class="fas fa-book"></i> My Repositories</a></li>
+            <li><a href="{{ url_for('explore_repositories') }}"><i class="fas fa-compass"></i> Explore Repositories</a></li>
+            <li><a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="dashboard-container">
+        <div class="header">
+            <h1>Home</h1>
+            <input type="text" class="search" placeholder="Find a repository...">
+        </div>
+
+        <!-- Create Repository Section -->
+        <div class="create-repo">
+            <h2>Create a New Repository</h2>
+            <form method="POST" action="{{ url_for('create_repo') }}">
+                <input type="text" placeholder="Repository name" name="repository_name" required>
+                <label for="visibility">Visibility:</label>
+                <select name="visibility" id="visibility">
+                    <option value="public">Public</option>
+                    <option value="private">Private</option>
+                </select>
+                <button type="submit">Create Repository</button>
+            </form>
+        </div>
+
+        <!-- My Repositories Section -->
+        <div class="repository-section">
+            <h2>My Repositories</h2>
+            <ul>
+                {% for repo in repos %}
+                <li>
+                    <a href="{{ url_for('repo', repo_id=repo._id) }}">{{ repo.owner }}/{{ repo.name }}</a>
+                    <div class="actions">
+                        <!-- Actions can be implemented if needed -->
+                    </div>
+                </li>
+                {% else %}
+                <li>No repositories to display.</li>
+                {% endfor %}
+            </ul>
+            <a href="{{ url_for('my_repositories') }}" class="btn-action">More</a>
+        </div>
+
+        <!-- Explore Other Repositories Section -->
+        <div class="repository-section">
+            <h2>Explore Other Repositories</h2>
+            <ul>
+                {% for repo in explore_repos %}
+                <li>
+                    <a href="{{ url_for('repo', repo_id=repo._id) }}">{{ repo.owner }}/{{ repo.name }}</a>
+                    <div class="actions">
+                        <!-- Actions can be implemented if needed -->
+                    </div>
+                </li>
+                {% else %}
+                <li>No repositories to explore.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p>TaskMasterXHub © 2024. All rights reserved.</p>
+        </footer>
+    </div>
+
+</body>
+</html>
+

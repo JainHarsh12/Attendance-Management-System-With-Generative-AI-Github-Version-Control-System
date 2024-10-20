@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore Repositories - TaskMasterXHub</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="side-nav">
+        <h2>TaskMasterXHub</h2>
+        <ul>
+            <li><a href="{{ url_for('github_dashboard') }}"><i class="fas fa-home"></i> GitHub Dashboard</a></li>
+            <li><a href="{{ url_for('create_repo') }}"><i class="fas fa-plus-circle"></i> Create Repository</a></li>
+            <li><a href="{{ url_for('my_repositories') }}"><i class="fas fa-compass"></i> My Repositories</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="dashboard-container">
+        <div class="header">
+            <h1>Explore Repositories</h1>
+        </div>
+
+        <div class="repository-section">
+            <ul>
+                {% for repo in repos %}
+                <li>
+                    <a href="{{ url_for('repo', repo_id=repo._id) }}">{{ repo.owner or 'Unknown' }}/{{ repo.name }}</a>
+                    <div class="actions">
+                        <!-- Add any actions you want -->
+                        <!-- Example actions -->
+                        <button class="btn-action"><i class="fas fa-star"></i> Star</button>
+                        <button class="btn-action"><i class="fas fa-code-branch"></i> Fork</button>
+                    </div>
+                </li>
+                {% else %}
+                <li>No repositories found.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    
+</body>
+</html>

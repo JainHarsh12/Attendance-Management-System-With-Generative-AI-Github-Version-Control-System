@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Repositories - TaskMasterXHub</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        /* Main content area */
+        .dashboard-container {
+            margin-left: 240px;
+            padding: 40px;
+            background-color: #f9f9f9;
+            min-height: 100vh;
+            width: calc(100% - 240px);
+            box-sizing: border-box;
+        }
+
+        /* Header and Create New Repository Button */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2rem;
+        }
+
+        .btn-create-repo {
+            padding: 10px 20px;
+            background-color: #007aff;
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-create-repo:hover {
+            background-color: #005bb5;
+        }
+
+        /* Repository List using CSS Grid */
+        .repository-list {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .repository-card {
+            background-color: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 220px;
+        }
+
+        .repository-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .repository-card h2 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+
+        .repository-card p {
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .repository-card-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .repository-card-actions a,
+        .repository-card-actions form {
+            width: 48%;
+        }
+
+        .repository-card-actions a,
+        .repository-card-actions form button {
+            background-color: #007aff;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            display: block;
+        }
+
+        .repository-card-actions a:hover,
+        .repository-card-actions form button:hover {
+            background-color: #005bb5;
+        }
+
+        .repository-card-actions form button.delete {
+            background-color: #ff3b30;
+        }
+
+        .repository-card-actions form button.delete:hover {
+            background-color: #d32f2f;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .repository-list {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 900px) {
+            .repository-list {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .repository-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="side-nav">
+        <h2>TaskMasterXHub</h2>
+        <ul>
+            <li><a href="{{ url_for('github_dashboard') }}"><i class="fas fa-home"></i> GitHub Dashboard</a></li>
+            <li><a href="{{ url_for('create_repo') }}"><i class="fas fa-plus-circle"></i> Create Repository</a></li>
+            <li><a href="{{ url_for('explore_repositories') }}"><i class="fas fa-compass"></i> Explore Repositories</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="dashboard-container">
+        <div class="header">
+            <h1>My Repositories</h1>
+            <a href="{{ url_for('create_repo') }}" class="btn-create-repo">Create New Repository</a>
+        </div>
+
+        <div class="repository-list">
+            <!-- Loop through repositories -->
+            {% if repos|length == 0 %}
+                <p>No repositories found.</p>
+            {% else %}
+                {% for repo in repos %}
+                <div class="repository-card">
+                    <h2>{{ repo.owner }}/{{ repo.name }}</h2>
+                    <p>{{ repo.description if repo.description else 'No description available.' }}</p>
+                    
+                    <!-- Check if timestamp exists before displaying -->
+                    {% if repo.timestamp %}
+                        <p>Last updated: {{ repo.timestamp.strftime('%Y-%m-%d') }}</p>
+                    {% else %}
+                        <p>Last updated: Not available</p>
+                    {% endif %}
+                    
+                    <div class="repository-card-actions">
+                        <a href="{{ url_for('repo', repo_id=repo._id) }}">View Repository</a>
+                        <form method="POST" action="{{ url_for('delete_repo', repo_id=repo._id) }}">
+                            <button class="delete" type="submit">Delete</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>TaskMasterXHub © 2024. All rights reserved.</p>
+    </footer>
+    
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+

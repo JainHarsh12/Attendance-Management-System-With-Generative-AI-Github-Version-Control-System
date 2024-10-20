@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commit History</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Helvetica Neue', sans-serif;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: 60px auto;
+            padding: 30px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 40px;
+            text-align: center;
+            color: #333;
+        }
+        .commit-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        .commit-list li {
+            background-color: #f9fafb;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        .commit-list li:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .commit-details {
+            font-size: 1.1rem;
+            color: #444;
+            margin-bottom: 20px;
+        }
+        .commit-details strong {
+            font-weight: 600;
+            color: #2d3748;
+        }
+        .commit-details small {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+        pre {
+            background-color: #f1f1f1;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            font-size: 0.9rem;
+            max-width: 100%; /* Ensure the diff stays within the container */
+        }
+        .diff-line {
+            padding: 2px 0;
+            display: block;
+            font-size: 1rem; /* Adjust for clarity */
+        }
+        .added {
+            background-color: #e6ffed;
+            color: #22863a;
+            padding-left: 10px;
+            border-left: 4px solid #34d058;
+        }
+        .removed {
+            background-color: #ffeef0;
+            color: #d73a49;
+            padding-left: 10px;
+            border-left: 4px solid #d73a49;
+        }
+        .fa-plus-circle {
+            color: #34d058;
+            margin-right: 8px;
+        }
+        .fa-minus-circle {
+            color: #d73a49;
+            margin-right: 8px;
+        }
+        .commit-history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        a.back-link {
+            display: inline-block;
+            margin-top: 20px;
+            font-size: 1.1rem;
+            color: #3b82f6;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        a.back-link:hover {
+            color: #2563eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="commit-history-header">
+            <h1>Commit History</h1>
+            <a href="{{ url_for('repo', repo_id=repo._id) }}" class="back-link">
+                <i class="fas fa-arrow-left"></i> Back to Repository
+            </a>
+        </div>
+
+        <ul class="commit-list">
+            {% for commit in commits %}
+            <li>
+                <div class="commit-details">
+                    <strong><i class="fas fa-code-branch"></i> Commit Message:</strong> {{ commit.commit_message }} <br>
+                    <small><i class="fas fa-user"></i> Committed by: {{ commit.user }} on {{ commit.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</small>
+                </div>
+                <h3>Changes:</h3>
+                {% if commit.diff %}
+                    <pre>
+                        {% for line in commit.diff.splitlines() %}
+                            {% if line.startswith('+') %}
+                                <span class="diff-line added"><i class="fas fa-plus-circle"></i>{{ line }}</span>
+                            {% elif line.startswith('-') %}
+                                <span class="diff-line removed"><i class="fas fa-minus-circle"></i>{{ line }}</span>
+                            {% endif %}
+                        {% endfor %}
+                    </pre>
+                {% else %}
+                    <p>No changes available.</p>
+                {% endif %}
+            </li>
+            {% else %}
+            <li>No commits found.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>
+

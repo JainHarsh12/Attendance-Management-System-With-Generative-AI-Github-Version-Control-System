@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - TaskMasterXHub</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="side-nav">
+        <h2>TaskMasterXHub</h2>
+        <ul>
+            <li><a href="{{ url_for('index') }}"><i class="fas fa-home"></i> Dashboard</a></li>
+<li><a href="{{ url_for('create_repo') }}"><i class="fas fa-plus-circle"></i> Create Repository</a></li>
+<li><a href="{{ url_for('explore_repositories') }}"><i class="fas fa-compass"></i> Explore Repositories</a></li>
+<li><a href="{{ url_for('profile') }}"><i class="fas fa-user"></i> Profile</a></li>
+<li><a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="dashboard-container">
+        <div class="header">
+            <h1>Your Profile</h1>
+        </div>
+
+        <div class="profile-section">
+            <h2>User Info</h2>
+            <p>Username: JainHarsh12</p>
+            <p>Email: jharshit61@gmail.com</p>
+            <h3>Your Repositories</h3>
+            <ul>
+                <li><a href="#">JainHarsh12/C-Programming-Assignments</a></li>
+                <li><a href="#">JainHarsh12/Python-Assignments</a></li>
+            </ul>
+        </div>
+    </div>
+    
+</body>
+</html>
