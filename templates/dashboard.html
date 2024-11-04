@@ -9,6 +9,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
     <!-- Theme Style (AdminLTE) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.1/dist/css/adminlte.min.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
     <!-- Custom CSS -->
     <style>
         /* Global Styles */
@@ -238,6 +241,118 @@
                 width: 100%;
                 text-align: center;
             }
+        }
+
+  /* Chatbot styles */
+  #chatbot-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #0084ff;
+    color: white;
+    border-radius: 50%;
+    width: 80px; /* Increased size */
+    height: 80px; /* Increased size */
+    border: none;
+    cursor: pointer;
+    font-size: 40px; /* Larger icon */
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#chatbot-window {
+    position: fixed;
+    bottom: 110px;
+    right: 20px;
+    width: 400px; /* Increased width */
+    max-height: 550px; /* Increased height */
+    background-color: white;
+    border: 1px solid #ccc;
+    display: none;
+    flex-direction: column;
+    z-index: 1000;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Added shadow */
+    border-radius: 15px; /* Rounded corners */
+}
+
+#chatbot-header {
+    background-color: #0084ff;
+    color: white;
+    padding: 15px;
+    font-size: 1.2em;
+    font-weight: bold;
+    text-align: center;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+#chatbot-messages {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 1em;
+}
+
+/* Styling for User and Bot Messages */
+.chatbot-message {
+    width: 100%; /* Ensure it takes up full width */
+    padding: 12px 18px;
+    border-radius: 15px;
+    line-height: 1.6;
+}
+
+.user-message {
+    align-self: flex-end;
+    background-color: #d1e7ff;
+    color: #0056b3;
+    text-align: left;
+    border-top-right-radius: 0;
+    max-width: 80%; /* Limit width to 80% on the right side */
+}
+
+.bot-message {
+    align-self: flex-start;
+    background-color: #f1f1f1;
+    color: #333;
+    text-align: left;
+    border-top-left-radius: 0;
+    max-width: 90%; /* Extend width more on the left side */
+}
+
+/* Input styling */
+#chatbot-input-container {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid #ddd;
+}
+
+#chatbot-input {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+}
+
+#chatbot-send {
+    padding: 5px 15px;
+    margin-left: 8px;
+    background-color: #0084ff;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2em;
+}
+
+
+        #chatbot-send:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
@@ -554,6 +669,18 @@
     </div>
   </div>
 
+<!-- Chatbot Button and Window -->
+<button id="chatbot-button"><i class="fas fa-comments"></i></button>
+
+<div id="chatbot-window">
+  <div id="chatbot-header">Task Assistant</div>
+  <div id="chatbot-messages"></div>
+  <div id="chatbot-input-container">
+    <input type="text" id="chatbot-input" placeholder="Type a message..." />
+    <button id="chatbot-send"><i class="fas fa-paper-plane"></i></button>
+  </div>
+</div>
+
 <!-- REQUIRED SCRIPTS -->
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
@@ -562,10 +689,68 @@
 <!-- AdminLTE App -->
 <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.1/dist/js/adminlte.min.js"></script>
 
+<script>
+  // Chatbot JavaScript
+// Chatbot JavaScript
+document.getElementById('chatbot-button').addEventListener('click', function() {
+    var chatbotWindow = document.getElementById('chatbot-window');
+    if (chatbotWindow.style.display === 'none' || chatbotWindow.style.display === '') {
+        chatbotWindow.style.display = 'flex';
+    } else {
+        chatbotWindow.style.display = 'none';
+    }
+});
+
+document.getElementById('chatbot-send').addEventListener('click', function() {
+    sendMessage();
+});
+
+document.getElementById('chatbot-input').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        sendMessage();
+    }
+});
+
+function sendMessage() {
+    var inputField = document.getElementById('chatbot-input');
+    var message = inputField.value.trim();
+    if (message === '') return;
+
+    // Display user message
+    var messagesContainer = document.getElementById('chatbot-messages');
+    var userMessageDiv = document.createElement('div');
+    userMessageDiv.classList.add('chatbot-message', 'user-message');
+    userMessageDiv.innerHTML = '<strong>You:</strong> ' + message;
+    messagesContainer.appendChild(userMessageDiv);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+    inputField.value = '';
+
+    // Send message to the server via AJAX
+    fetch('{{ url_for("chatbot_api") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: message })
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Display chatbot response
+        var botMessageDiv = document.createElement('div');
+        botMessageDiv.classList.add('chatbot-message', 'bot-message');
+        botMessageDiv.innerHTML = '<strong>Bot:</strong> ' + data.response;
+        messagesContainer.appendChild(botMessageDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+</script>
+
 </body>
 </html>
-
-
-
 
 

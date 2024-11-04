@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory, session
+from flask import Flask, render_template, request, redirect, url_for, flash, send_from_directory, session, jsonify  # Added jsonify
 from flask_login import LoginManager, login_user, login_required, logout_user, UserMixin, current_user
 from flask_pymongo import PyMongo
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -19,6 +19,7 @@ import logging
 import pymongo
 import docx  # For DOCX file extraction
 import PyPDF2  # For PDF file extraction
+from langdetect import detect  # For language detection
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -30,6 +31,7 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'your-secret-key')  # Replace with your actual secret key
 
+
 # Secure Cookie Configuration
 app.config.update(
     SESSION_COOKIE_SECURE=False,  # Set to True in production with HTTPS
@@ -38,7 +40,10 @@ app.config.update(
 )
 
 # MongoDB Configuration
-app.config["MONGO_URI"] = os.getenv("MONGO_URI", "mongodb+srv://jharshit61:New1212@cluster0.sydzy.mongodb.net/developerportal?retryWrites=true&w=majority")  # Replace with your actual MongoDB URI
+app.config["MONGO_URI"] = os.getenv(
+    "MONGO_URI",
+    "mongodb+srv://jharshit61:New1212@cluster0.sydzy.mongodb.net/developerportal?retryWrites=true&w=majority"
+)  # Replace with your actual MongoDB URI
 app.config['UPLOAD_FOLDER'] = 'uploads/'
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB
 
@@ -237,6 +242,123 @@ def extract_questions_from_pdf(file_path):
     except Exception as e:
         logger.error(f"Error extracting content from {file_path}: {str(e)}")
         return ""
+
+# Function to get chatbot response using Gemini API
+def get_chatbot_response(user_message):
+    # Detect user role (superuser or normal user) and set context
+    is_admin = current_user.role == "superuser"
+    
+    # Prevent normal users from requesting other users' tasks
+    user_name_match = re.search(r"tasks? assigned to (\w+)", user_message.lower())
+    if not is_admin and user_name_match:
+        return "You do not have permission to view other users' tasks."
+
+    # Fetch the user's tasks or another user's tasks if requested by an admin
+    tasks = []
+    try:
+        if is_admin and user_name_match:
+            # Superuser requesting tasks for a specific user
+            other_user = user_name_match.group(1).lower()
+            user_obj = mongo.db.users.find_one({"username": other_user})
+            if user_obj:
+                tasks = list(mongo.db.tasks.find({"user_id": user_obj["_id"]}))
+            else:
+                return f"No user found with the username '{other_user}'."
+        else:
+            # Fetch only the current user's tasks
+            tasks = list(mongo.db.tasks.find({"user_id": ObjectId(current_user.id)}))
+        
+        # Classify tasks based on status and deadline
+        now = datetime.now()
+        overdue_tasks = [
+            task for task in tasks if task.get("deadline") and now > task["deadline"]
+        ]
+        pending_tasks = [
+            task for task in tasks if task.get("status") == "pending" and task not in overdue_tasks
+        ]
+        completed_tasks = [
+            task for task in tasks if task.get("status") == "completed"
+        ]
+
+        # Helper to format task lists with deadlines (plain text formatting without symbols)
+        def format_task_list(task_list, status_label):
+            return "\n".join([
+                f"{status_label}: {task['task_name']} (Deadline: {task['deadline'].strftime('%Y-%m-%d') if task.get('deadline') else 'No deadline'})"
+                for task in task_list
+            ])
+
+        # Determine if the user asked for deadlines specifically
+        deadline_query = re.search(r"what is the deadline date(?: for (\w+))?", user_message.lower())
+        if deadline_query:
+            # Provide detailed deadlines for specific tasks or all tasks
+            task_name = deadline_query.group(1)
+            if task_name:
+                specific_task = next((task for task in tasks if task['task_name'].lower() == task_name), None)
+                if specific_task:
+                    deadline = specific_task.get("deadline")
+                    return f"The deadline for '{specific_task['task_name']}' is: {deadline.strftime('%Y-%m-%d') if deadline else 'No deadline set'}."
+                else:
+                    return f"No task found with the name '{task_name}'."
+            else:
+                deadlines_summary = "\n".join([
+                    f"{task['task_name']}: {task['deadline'].strftime('%Y-%m-%d') if task.get('deadline') else 'No deadline set'}"
+                    for task in tasks
+                ])
+                return f"Here are the deadlines for your tasks:\n{deadlines_summary}"
+
+        # Prepare task overview with statuses and deadlines in plain text
+        tasks_overview = (
+            f"Tasks Overview:\n\n"
+            f"Overdue Tasks:\n{format_task_list(overdue_tasks, 'Overdue') if overdue_tasks else 'No overdue tasks.'}\n\n"
+            f"Pending Tasks:\n{format_task_list(pending_tasks, 'Pending') if pending_tasks else 'No pending tasks.'}\n\n"
+            f"Completed Tasks:\n{format_task_list(completed_tasks, 'Completed') if completed_tasks else 'No completed tasks.'}\n"
+        )
+
+        # Notice for overdue tasks
+        overdue_notice = (
+            "\n\nPlease contact your teacher regarding these overdue tasks as they cannot be submitted."
+            if overdue_tasks else ""
+        )
+
+        # Handle "hello" greeting specifically for superuser to avoid task status message
+        if is_admin and user_message.strip().lower() == "hello":
+            return "Hello! How can I assist you with tasks or other queries today?"
+
+        # Generate a response with task summary and deadline notice if applicable
+        prompt_text = f"""
+        You are an assistant that helps users with their tasks, deadlines, and priorities.
+
+        User Role: {"Admin" if is_admin else "Regular User"}
+        User's Question: {user_message}
+
+        {tasks_overview}{overdue_notice}
+        
+        Provide a concise response to the user's question about tasks based on the information above, considering their role and what they asked.
+        """
+
+        # Generate response
+        model = genai.GenerativeModel("gemini-1.5-flash")
+        response = model.generate_content(prompt_text)
+        
+        # Return the model’s response
+        assistant_reply = response.text.strip() if response and hasattr(response, 'text') else "I'm here to help with your tasks!"
+        return assistant_reply
+
+    except Exception as e:
+        logger.error(f"Error in get_chatbot_response: {str(e)}")
+        return "Sorry, I'm having trouble understanding you right now."
+
+# Route to handle chatbot AJAX requests
+@app.route('/chatbot_api', methods=['POST'])
+@login_required
+def chatbot_api():
+    data = request.get_json()
+    user_message = data.get('message', '')
+
+    # Get the chatbot response
+    response = get_chatbot_response(user_message)
+
+    return jsonify({'response': response})
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -486,6 +608,7 @@ def dashboard():
 @login_required
 def taskmasterhub():
     return redirect(url_for('github_dashboard'))
+
 
 @app.route('/create_task', methods=['POST'])
 @login_required
