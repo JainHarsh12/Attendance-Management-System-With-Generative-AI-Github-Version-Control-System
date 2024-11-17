@@ -44,7 +44,6 @@ When a superuser uploads educational or project materials:
 - **Adaptive Responses**: Plans are tailored dynamically based on the number of days left until the deadline.
 
 #### **Example AI Prompt:**
-```plaintext
 "You are an expert in educational content creation. Based on the following task and specific content, create a detailed 7-day plan to address the case studies and questions provided. 
 
 Task: 'AI Fundamentals'
