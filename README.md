@@ -52,54 +52,57 @@ Content: (Extracted content from uploaded documents)
 Provide a step-by-step plan that breaks down the content into actionable tasks."
 
 
-2️⃣ Chatbot Assistance
-Role-Based Insights: Gemini AI dynamically generates responses to user queries based on their role (e.g., admin, regular user).
-Task Queries: Provides instant information on deadlines, overdue tasks, and task summaries.
-Natural Language Processing: Detects intent and provides precise responses (e.g., "What are the deadlines for my tasks?").
+### **2️⃣ Chatbot Assistance**
+- **Role-Based Insights**: Gemini AI dynamically generates responses to user queries based on their role (e.g., admin, regular user).
+- **Task Queries**: Provides instant information on deadlines, overdue tasks, and task summaries.
+- **Natural Language Processing**: Detects intent and provides precise responses (e.g., "What are the deadlines for my tasks?").
 
-![image](https://github.com/user-attachments/assets/0eac49ba-4065-4f3f-a7f9-7429d4761875)
+- ![image](https://github.com/user-attachments/assets/0eac49ba-4065-4f3f-a7f9-7429d4761875)
 
 
-🔧 Technology Stack
-Backend
-Flask: Lightweight Python framework for RESTful APIs and user authentication.
-Flask-PyMongo: For seamless MongoDB integration.
-Google Generative AI (Gemini): Core LLM for task automation and chatbot functionalities.
+### 🔧 **Technology Stack**
+#### **Backend**
+- **Flask**: Lightweight Python framework for RESTful APIs and user authentication.
+- **Flask-PyMongo**: For seamless MongoDB integration.
+- **Google Generative AI (Gemini)**: Core LLM for task automation and chatbot functionalities.
 
-Frontend
-HTML/CSS & Jinja2: Dynamic templates for rendering user-specific dashboards.
-Streamlit: Optional frontend for generative AI visualization.
+#### **Frontend**
+- **HTML/CSS & Jinja2**: Dynamic templates for rendering user-specific dashboards.
+- **Streamlit**: Optional frontend for generative AI visualization.
 
-Database
-MongoDB Atlas: Cloud-hosted database for scalability.
-Additional Libraries
-PyPDF2 & docx: For file parsing and content extraction.
-Flake8 & W3C Validator: Code quality checks and testing.
-dotenv: Secure environment variable handling.
+#### **Database**
+- **MongoDB Atlas**: Cloud-hosted database for scalability.
 
-⚙️ How It Works
-User Authentication: Secure login and role-based access via Flask-Login.
-Task Creation:
-Admin uploads files or provides task content.
-AI processes inputs and generates a structured plan.
+#### **Additional Libraries**
+- **PyPDF2 & docx**: For file parsing and content extraction.
+- **Flake8 & W3C Validator**: Code quality checks and testing.
+- **dotenv**: Secure environment variable handling.
 
-Progress Submission:
-Users submit their daily work with attached files.
-Tasks are dynamically updated based on submission data.
+---
 
-Chatbot Assistance:
-Users query the AI-powered assistant for task insights.
+### ⚙️ **How It Works**
+1. **User Authentication**: Secure login and role-based access via **Flask-Login**.
+2. **Task Creation**:
+   - Admin uploads files or provides task content.
+   - AI processes inputs and generates a structured plan.
+3. **Progress Submission**:
+   - Users submit their daily work with attached files.
+   - Tasks are dynamically updated based on submission data.
+4. **Chatbot Assistance**:
+   - Users query the AI-powered assistant for task insights.
+5. **GitHub Repository**:
+   - Users manage repositories, upload files, and view commit histories.
 
-GitHub Repository:
-Users manage repositories, upload files, and view commit histories.
+---
 
-🌟 Why TaskMasterXHub Stands Out
-Generative AI-Powered Productivity: The seamless integration of Google Gemini LLM provides unparalleled task automation.
-Comprehensive Ecosystem: From task management to GitHub-style repository handling, it's all in one place.
-Real-World Use Cases: Ideal for educators, project managers, and collaborative teams.
+### 🌟 **Why TaskMasterXHub Stands Out**
+1. **Generative AI-Powered Productivity**: The seamless integration of **Google Gemini LLM** provides unparalleled task automation.
+2. **Comprehensive Ecosystem**: From task management to GitHub-style repository handling, it's all in one place.
+3. **Real-World Use Cases**: Ideal for **educators**, **project managers**, and **collaborative teams**.
 
-🏆 Acknowledgments
+---
+
+### 🏆 **Acknowledgments**
 This project would not have been possible without the support of:
-
-Google Generative AI for task breakdown and chatbot functionalities.
-MongoDB Atlas for seamless database integration.
+- **Google Generative AI** for task breakdown and chatbot functionalities.
+- **MongoDB Atlas** for seamless database integration.
