@@ -52,6 +52,7 @@ Deadline: 7 days
 Content: (Extracted content from uploaded documents)
 Provide a step-by-step plan that breaks down the content into actionable tasks."
 
+
 2️⃣ Chatbot Assistance
 Role-Based Insights: Gemini AI dynamically generates responses to user queries based on their role (e.g., admin, regular user).
 Task Queries: Provides instant information on deadlines, overdue tasks, and task summaries.
